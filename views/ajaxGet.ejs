@@ -2,36 +2,69 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <input type="text" id="inputName" placeholder="請輸入姓名" />
-    <button id="button1">Ajax</button>
-    <div id="div1">顯示結果</div>
+    <input type="text" id="inputName" placeholder="請輸入姓名" >
+   <button id="button1">Ajax</button>
+   <button id="button2">Ajax取消</button>
+   <div id="div1">顯示結果</div>
     <script>
       //找到要控制的對象  querySelector('css selectors')
-      const btnAsync = document.querySelector("#button1");
-      const divMessage = document.querySelector("#div1");
-      const txtName = document.querySelector("#inputName");
+      const btnAsync = document.querySelector('#button1');
+      const btnAjaxCancel = document.querySelector('#button2');
+      const divMessage = document.querySelector('#div1');
+      const txtName = document.querySelector('#inputName');
+      let xhr = null;
 
+      btnAjaxCancel.addEventListener('click',()=>{
+        xhr.abort();
+      })
+      
       //使用者按下按鈕在div上顯示文字
-      //使用者按下按鈕這個動作(event)，在程式中叫做 clcik
-      btnAsync.addEventListener("click", () => {
+      //使用者按下按鈕這個動作(event)，在程式中叫做 clcik 
+      btnAsync.addEventListener('click',()=>{
         //步驟一 先建立Ajax物件
-        const xhr = new XMLHttpRequest();
-        //load事件表示資料已經回傳到瀏覽器
-        xhr.addEventListener("load", () => {
-          //步驟三 接收伺服器回傳的資料
-          const data = xhr.responseText;
-          //步驟四 讀資料，顯示資料
-          //顯示文字
-          divMessage.innerHTML = `<h2>${data}</h2>`;
-        });
+        xhr = new XMLHttpRequest();           
+            //load事件表示資料已經回傳到瀏覽器
+            xhr.addEventListener('load',()=>{
+              console.log('load');
+                 //步驟三 接收伺服器回傳的資料
+                const data = xhr.responseText;
+
+                //步驟四 讀資料，顯示資料
+                //顯示文字
+                divMessage.innerHTML = `<h2>${data}</h2>`;
+            })     
+            //ajax開始會觸發loadstart事件
+            xhr.addEventListener('loadstart',()=>{
+              console.log("loadstart");
+            })
+             //ajax結束會觸發loadend事件
+            xhr.addEventListener('loadend',()=>{
+              console.log("loadend");
+            })
+
+            xhr.addEventListener('timeout',()=>{
+              console.log('timeout')
+              divMessage.innerHTML = `<h2>伺服器忙碌中，請稍後再來</h2>`;
+            })
+            xhr.addEventListener('abort',()=>{
+              console.log('abort')
+              divMessage.innerHTML = `<h2>您停止了Ajax的執行</h2>`;
+            })
         //步驟二 對伺服器發出要求
         //open("http method","要呼叫的伺服器端程式")
-        xhr.open("GET", `/users?name=${txtName.value}`); //打開瀏覽器輸入網址
+        xhr.open("GET",`/users?name=${txtName.value}`); //打開瀏覽器輸入網址
+        xhr.timeout = 3000;  //伺服器在3秒鐘內沒有回傳結果，我們就終止程式的執行
         xhr.send(); //輸入網只後，按下Enter鍵，才會發出要求(Request)
-      });
+
+    
+
+
+
+        
+      })
     </script>
   </body>
 </html>
